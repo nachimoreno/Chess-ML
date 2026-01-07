@@ -52,7 +52,8 @@ def current_time() -> str:
 
 fields = [
     "Event", "Site", "UTCDate", "UTCTime", "White", "Black", "Result",
-    "WhiteElo", "BlackElo", "TimeControl", "Termination", "Variant"
+    "WhiteElo", "BlackElo", "TimeControl", "Termination", "PlyCount",
+    "MoveCount"
 ]
 
 with open(CSV_PATH, "w", newline="", encoding="utf-8") as output:
@@ -71,6 +72,13 @@ with open(CSV_PATH, "w", newline="", encoding="utf-8") as output:
 
         row["WhiteElo"] = safe_cast_to_int(row["WhiteElo"])
         row["BlackElo"] = safe_cast_to_int(row["BlackElo"])
+
+        ply = safe_cast_to_int(headers.get("PlyCount"))
+        row["PlyCount"] = ply
+        if ply is None:
+            ply = sum(1 for _ in game.mainline_moves())
+            row["PlyCount"] = ply
+            row["MoveCount"] = (ply + 1) // 2
 
         writer.writerow(row)
 
